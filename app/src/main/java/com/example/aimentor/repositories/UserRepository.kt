@@ -31,7 +31,7 @@ class UserRepository(context: Context) {
         }
         val insert = db.insert(DatabaseHelper.TABLE_USER, null, values)
         db.close()
-        return insert != 1L
+        return insert != -1L
         // return true : thanh cong va nguoc lai
     }
     // viet thuc kiem tra Username da ton tai chua?

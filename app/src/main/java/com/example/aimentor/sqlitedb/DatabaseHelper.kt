@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
     companion object {
         // ten CSDL
         private const val DB_NAME = "ai_mentor"
-        private const val DB_VERSION = 1
+        private const val DB_VERSION = 2
 
         // dinh nghia cac thong cho bang "users"
         // luu tru thong tin tai khoan nguoi dung
@@ -47,10 +47,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         oldVersion: Int,
         newVersion: Int
     ) {
-        if (oldVersion != newVersion) {
-            // chay lai datbase
-            db?.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
-            onCreate(db)
-        }
+//        if (oldVersion != newVersion) {
+//            // chay lai datbase
+//            db?.execSQL("DROP TABLE IF EXISTS $TABLE_USER")
+//            onCreate(db)
+//        }
     }
 }

@@ -6,6 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.aimentor.R
+// [MỚI] các import phục vụ gọi API + RecyclerView
+import android.widget.Button
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.aimentor.adapter.ProductAdapter
+import com.example.aimentor.api.RetrofitClient
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,6 +32,14 @@ class HomeFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    // [MỚI] các view + adapter cho danh sách sản phẩm
+    private val productAdapter = ProductAdapter()
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var layoutError: View
+    private lateinit var tvError: TextView
+    private lateinit var btnRetry: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -36,6 +54,55 @@ class HomeFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
+    }
+
+    // [MỚI] Chạy sau onCreateView: ánh xạ view, cấu hình RecyclerView và gọi API
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        recyclerView = view.findViewById(R.id.recyclerViewProducts)
+        progressBar  = view.findViewById(R.id.progressBarProducts)
+        layoutError  = view.findViewById(R.id.layoutError)
+        tvError      = view.findViewById(R.id.tvError)
+        btnRetry     = view.findViewById(R.id.btnRetry)
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = productAdapter
+
+        btnRetry.setOnClickListener { loadProducts() }
+        loadProducts()
+    }
+
+    // [MỚI] Gọi API trong coroutine (tự chạy nền, không chặn UI)
+    private fun loadProducts() {
+        showLoading()
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val products = RetrofitClient.api.getAllProducts()
+                productAdapter.submitList(products)
+                showContent()
+            } catch (e: Exception) {
+                showError("Không thể tải dữ liệu:\n${e.message}")
+            }
+        }
+    }
+
+    private fun showLoading() {
+        progressBar.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+        layoutError.visibility = View.GONE
+    }
+
+    private fun showContent() {
+        progressBar.visibility = View.GONE
+        recyclerView.visibility = View.VISIBLE
+        layoutError.visibility = View.GONE
+    }
+
+    private fun showError(message: String) {
+        progressBar.visibility = View.GONE
+        recyclerView.visibility = View.GONE
+        layoutError.visibility = View.VISIBLE
+        tvError.text = message
     }
 
     companion object {
