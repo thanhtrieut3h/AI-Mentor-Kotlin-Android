@@ -23,3 +23,5 @@ caches/
 
 # Android Studio
 .idea/
+gradle/wrapper/gradle-*.jar
+gradle/wrapper/gradle-*.bin
